@@ -1,0 +1,150 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: GATEWAY-SERVICE
+  cloud:
+    discovery:
+      enabled: true
+    gateway:
+      routes:
+        # Swagger UI and OpenAPI routes
+        - id: openapi
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/v3/api-docs/authentication-service
+          filters:
+            - RewritePath=/v3/api-docs/authentication-service, /v3/api-docs
+
+        - id: openapi-customer
+          uri: lb://CUSTOMER-SERVICE
+          predicates:
+            - Path=/v3/api-docs/customer-service
+          filters:
+            - RewritePath=/v3/api-docs/customer-service, /v3/api-docs
+
+        - id: openapi-accounting
+          uri: lb://ACCOUNTING-SERVICE
+          predicates:
+            - Path=/v3/api-docs/accounting-service
+          filters:
+            - RewritePath=/v3/api-docs/accounting-service, /v3/api-docs
+
+        - id: swagger-ui
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/swagger-ui/**
+
+        # Authentication Service Routes
+        - id: authentication-service-auth
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/authentication/**
+          filters:
+            - RewritePath=/authentication/(?<segment>.*), /authentication/${segment}
+
+        - id: authentication-service-passwords
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/passwords/**
+          filters:
+            - RewritePath=/passwords/(?<segment>.*), /passwords/${segment}
+
+        - id: authentication-service-roles
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/roles/**
+          filters:
+            - RewritePath=/roles/(?<segment>.*), /roles/${segment}
+
+        - id: authentication-service-users
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/users/**
+          filters:
+            - RewritePath=/users/(?<segment>.*), /users/${segment}
+
+        # Customer Service Routes
+        - id: customer-service
+          uri: lb://CUSTOMER-SERVICE
+          predicates:
+            - Path=/customers/**
+
+        # Accounting Service Routes
+        - id: accounting-service-accounts
+          uri: lb://ACCOUNTING-SERVICE
+          predicates:
+            - Path=/accounts/**
+
+        - id: accounting-service-transactions
+          uri: lb://ACCOUNTING-SERVICE
+          predicates:
+            - Path=/transactions/**
+
+        - id: accounting-service-cards
+          uri: lb://ACCOUNTING-SERVICE
+          predicates:
+            - Path=/cards/**
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - http://localhost:4200
+              - http://localhost:8761
+              - http://localhost:8888
+              - http://localhost
+              - http://127.0.0.1
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders:
+              - Authorization
+              - Content-Type
+              - Access-Control-Allow-Origin
+              - Access-Control-Allow-Methods
+              - Access-Control-Allow-Headers
+              - Access-Control-Max-Age
+            exposedHeaders:
+              - Authorization
+              - Access-Control-Allow-Origin
+            maxAge: 3600
+            allowCredentials: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+springdoc:
+  swagger-ui:
+    urls:
+      - url: /v3/api-docs/authentication-service
+        name: Authentication Service
+      - url: /v3/api-docs/customer-service
+        name: Customer Service
+      - url: /v3/api-docs/accounting-service
+        name: Accounting Service
+    path: /swagger-ui.html
+  api-docs:
+    enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG

@@ -1,0 +1,66 @@
+server:
+  port: 8887
+#  servlet:
+#    context-path: /bank
+
+spring:
+  application:
+    name: ACCOUNTING-SERVICE
+
+
+
+  # PostgreSQL Configuration
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5433}/${POSTGRES_DB:my_database}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:admin}
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  # MongoDB Configuration
+  data:
+    mongodb:
+      host: ${MONGO_HOST:localhost}
+      port: ${MONGO_PORT:27017}
+      database: ${MONGO_DB:bank_transactions}
+      auto-index-creation: true
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: accounting-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+application:
+  security:
+    jwt:
+      secret: "AaZzBbCcYyDdXxEeWwFf"
+      expiration: 604800000
+
+# Eureka Configuration
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVICE:http://localhost:8761/eureka/}
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" 

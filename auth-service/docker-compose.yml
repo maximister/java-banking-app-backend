@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: my_postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: my_database
+    ports:
+      - "5433:5432" # Локальный порт указывает на порт контейнера Postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    restart: always
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    ports:
+       - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+volumes:
+  postgres_data:
