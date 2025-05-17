@@ -32,16 +32,18 @@ public class ClientServiceImpl implements ClientService {
     public ClientResponseDTO getClientById(String id) {
         log.info("In getCustomerById()");
         Client client = findClientById(id);
-        log.info("Customer with id '{}' found",id);
+        log.info("Customer with id '{}' found", id);
         return Mapper.fromCustomer(client);
     }
 
     @Override
-    public ClientResponseDTO getClientByCin(String cin) {
+    public ClientResponseDTO getClientByEmail(String email) {
         log.info("In getCustomerByCin()");
-        Client client = clientRepository.findByCin(cin)
-                .orElseThrow(() -> new ClientNotFoundException(String.format("Customer with cin '%s' not found", cin)));
-        log.info("Customer with cin '{}' found",cin);
+        Client client = clientRepository.findByEmail(email)
+                .orElseThrow(() -> new ClientNotFoundException(
+                        String.format("Customer with email '%s' not found", email)
+                ));
+        log.info("Customer with cin '{}' found", email);
         return Mapper.fromCustomer(client);
     }
 
@@ -50,7 +52,7 @@ public class ClientServiceImpl implements ClientService {
         log.info("In getAllCustomers()");
         Pageable pageable = PageRequest.of(page, size);
         Page<Client> clients = clientRepository.findAll(pageable);
-        log.info("{} clients found",clients.getTotalElements());
+        log.info("{} clients found", clients.getTotalElements());
         return Mapper.fromPageOfCustomers(clients);
     }
 
@@ -58,8 +60,8 @@ public class ClientServiceImpl implements ClientService {
     public ClientPageResponseDTO searchClients(String keyword, int page, int size) {
         log.info("In searchCustomers()");
         Pageable pageable = PageRequest.of(page, size);
-        Page<Client> clients = clientRepository.search("%"+keyword+"%", pageable);
-        log.info("{} clients found.",clients.getTotalElements());
+        Page<Client> clients = clientRepository.search("%" + keyword + "%", pageable);
+        log.info("{} clients found.", clients.getTotalElements());
         return Mapper.fromPageOfCustomers(clients);
     }
 
@@ -78,7 +80,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public ClientResponseDTO updateClient(String id, @NotNull ClientRequestDTO dto) {
         Client client = findClientById(id);
-        validationBeforeUpdateUser(client.getEmail(), client.getCin(), dto.getEmail(), dto.getCin());
+        validationBeforeUpdateUser(client.getEmail(), dto.getEmail());
         Client clientToUpdate = Mapper.updateCustomerItems(client, dto);
         Client clientUpdated = clientRepository.save(clientToUpdate);
         log.info("Client with id {} updated", clientUpdated.getId());
@@ -90,36 +92,30 @@ public class ClientServiceImpl implements ClientService {
     public void deleteClientById(String id) {
         log.info("In deleteCustomerById()");
         clientRepository.deleteById(id);
-        log.info("Client with id '{}' deleted",id);
+        log.info("Client with id '{}' deleted", id);
     }
 
     private Client findClientById(String id) {
         return clientRepository.findById(id)
-                .orElseThrow( () -> new ClientNotFoundException(String.format("Client with id %s not found", id)));
+                .orElseThrow(() -> new ClientNotFoundException(String.format("Client with id %s not found", id)));
     }
 
     private void validateBeforeCreateClient(String email, String cin) {
         List<String> messages = new ArrayList<>();
-        if(clientRepository.existsByCin(cin)) {
-            messages.add(String.format("Client with cin '%s' already exist", cin));
-        }
-        if(clientRepository.existsByEmail(email)) {
+        if (clientRepository.existsByEmail(email)) {
             messages.add(String.format("Client with email '%s' already exist", email));
         }
-        if(!messages.isEmpty()) {
+        if (!messages.isEmpty()) {
             throw new FieldValidationException("Invalid data", messages);
         }
     }
 
-    private void validationBeforeUpdateUser(@NotNull String oldEmail, String oldCin, String newEmail, String newCin) {
+    private void validationBeforeUpdateUser(@NotNull String oldEmail, String newEmail) {
         List<String> messages = new ArrayList<>();
-        if(!oldEmail.equals(newEmail) && clientRepository.existsByEmail(newEmail)) {
+        if (!oldEmail.equals(newEmail) && clientRepository.existsByEmail(newEmail)) {
             messages.add(String.format("Client with email '%s' already exist", newEmail));
         }
-        if(!oldCin.equals(newCin) && clientRepository.existsByCin(newCin)) {
-            messages.add(String.format("Client with CIN '%s' already exist", newCin));
-        }
-        if(!messages.isEmpty()) {
+        if (!messages.isEmpty()) {
             throw new FieldValidationException("Invalid data", messages);
         }
     }

@@ -33,20 +33,7 @@ public class User {
     private String lastname;
 
     @Column(nullable = false)
-    private String placeOfBirth;
-
-    @Column(nullable = false)
     private LocalDate dateOfBirth;
-
-    @Column(nullable = false)
-    private String nationality;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-
-    @Column(nullable = false, unique = true)
-    private String cin;
 
     @Column(nullable = false, unique = true)
     private String email;

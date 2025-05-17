@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO createUser(@NotNull UserRequestDTO dto) {
         log.info("In createUser()");
-        validationBeforeCreate(dto.getCin(), dto.getEmail(), dto.getUsername());
+        validationBeforeCreate(dto.getEmail(), dto.getUsername());
         User user = Mappers.fromUserRequestDTO(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         User savedUser = userRepository.save(user);
@@ -166,16 +166,13 @@ public class UserServiceImpl implements UserService {
         return roleRepository.findByName(name).orElseThrow( () -> new RoleNotFoundException(String.format("Role %s not found", name)) );
     }
 
-    private void validationBeforeCreate(String cin, String email, String username) {
+    private void validationBeforeCreate(String email, String username) {
         List<String> messages = new ArrayList<>();
         if(userRepository.existsByUsername(username)) {
             messages.add("Username already exists");
         }
         if(userRepository.existsByEmail(email)) {
             messages.add("Email already exists");
-        }
-        if(userRepository.existsByCin(cin)) {
-            messages.add("Cin already exists");
         }
         if(!messages.isEmpty()){
             throw new FieldValidationException("Invalid username or email or cin", messages);
@@ -190,9 +187,6 @@ public class UserServiceImpl implements UserService {
         if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
             errors.add("Email already exists");
         }
-        if(!user.getCin().equals(dto.getCin()) && userRepository.existsByCin(dto.getCin())) {
-            errors.add("Cin already exists");
-        }
         if(!errors.isEmpty()){
             throw new FieldValidationException("Invalid username or email or cin", errors);
         }
@@ -202,10 +196,6 @@ public class UserServiceImpl implements UserService {
         user.setFirstname(dto.getFirstname());
         user.setLastname(dto.getLastname());
         user.setEmail(dto.getEmail());
-        user.setPlaceOfBirth(dto.getPlaceOfBirth());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setNationality(dto.getNationality());
-        user.setGender(dto.getGender());
-        user.setCin(dto.getCin());
     }
 }

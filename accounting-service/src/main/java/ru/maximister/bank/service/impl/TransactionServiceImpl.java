@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.maximister.bank.dto.TransactionRequest;
 import ru.maximister.bank.dto.TransactionResponse;
+import ru.maximister.bank.dto.TransferRequest;
 import ru.maximister.bank.entity.Account;
 import ru.maximister.bank.entity.Transaction;
 import ru.maximister.bank.enums.TransactionStatus;
@@ -57,6 +58,55 @@ public class TransactionServiceImpl implements TransactionService {
         kafkaService.sendTransactionEvent(response);
        // notificationService.sendTransactionNotification(response);
         
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public TransactionResponse transfer(TransferRequest request) {
+        // Проверяем существование счетов
+        Account sourceAccount = accountRepository.findById(request.getSourceAccountId())
+                .orElseThrow(() -> new EntityNotFoundException("Source account not found with id: " + request.getSourceAccountId()));
+        Account targetAccount = accountRepository.findById(request.getTargetAccountId())
+                .orElseThrow(() -> new EntityNotFoundException("Target account not found with id: " + request.getTargetAccountId()));
+
+        // Проверяем достаточность средств
+        if (sourceAccount.getBalance().compareTo(request.getAmount()) < 0) {
+            throw new IllegalStateException("Insufficient funds in source account");
+        }
+
+        // Создаем транзакцию списания
+        Transaction outgoingTransaction = Transaction.builder()
+                .accountId(request.getSourceAccountId())
+                .amount(request.getAmount())
+                .type(TransactionType.TRANSFER_OUT)
+                .description(request.getDescription())
+                .status(TransactionStatus.COMPLETED)
+                .build();
+
+        // Создаем транзакцию зачисления
+        Transaction incomingTransaction = Transaction.builder()
+                .accountId(request.getTargetAccountId())
+                .amount(request.getAmount())
+                .type(TransactionType.TRANSFER_IN)
+                .description(request.getDescription())
+                .status(TransactionStatus.COMPLETED)
+                .build();
+
+        // Обновляем балансы
+        sourceAccount.setBalance(sourceAccount.getBalance().subtract(request.getAmount()));
+        targetAccount.setBalance(targetAccount.getBalance().add(request.getAmount()));
+
+        // Сохраняем изменения
+        accountRepository.save(sourceAccount);
+        accountRepository.save(targetAccount);
+        transactionRepository.save(outgoingTransaction);
+        TransactionResponse response = mapToResponse(transactionRepository.save(incomingTransaction));
+
+        // Отправляем события
+        kafkaService.sendTransactionEvent(response);
+        // notificationService.sendTransactionNotification(response);
+
         return response;
     }
 

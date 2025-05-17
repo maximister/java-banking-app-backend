@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.maximister.bank.dto.TransactionRequest;
 import ru.maximister.bank.dto.TransactionResponse;
+import ru.maximister.bank.dto.TransferRequest;
 import ru.maximister.bank.service.TransactionService;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,14 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(transactionService.createTransaction(request));
     }
+
+    @PostMapping("/transfer")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<TransactionResponse> transfer(@Valid @RequestBody TransferRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(transactionService.transfer(request));
+    }
+
 
     @GetMapping("/{transactionId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPER_ADMIN')")

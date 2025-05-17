@@ -31,21 +31,8 @@ public class Client {
     private String lastname;
 
     @Column(nullable = false)
-    private String placeOfBirth;
-
-    @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate dateOfBirth;
-
-    @Column(nullable = false)
-    private String nationality;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-
-    @Column(unique = true, nullable = false)
-    private String cin;
 
     @Column(unique = true, nullable = false)
     private String email;

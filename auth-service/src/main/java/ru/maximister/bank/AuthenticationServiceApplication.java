@@ -54,13 +54,9 @@ public class AuthenticationServiceApplication {
                 log.info("No super admin found");
                 try {
                     User superAdmin = new User();
-                    superAdmin.setCin("Administrator CIN");
                     superAdmin.setFirstname("Administrator's First Name");
                     superAdmin.setLastname("Administrator's Last Name");
-                    superAdmin.setNationality("Administrator Nationality");
                     superAdmin.setDateOfBirth(LocalDate.of(1994, 1, 22));
-                    superAdmin.setPlaceOfBirth("Administrator's Birthday");
-                    superAdmin.setGender(Gender.M);
                     superAdmin.setUsername("ADMINISTRATOR");
                     superAdmin.setEmail("maximrevenko1@gmail.com");
                     superAdmin.setPasswordNeedToBeModified(Boolean.TRUE);

@@ -18,11 +18,7 @@ public class UserResponseDTO {
     private String id;
     private String firstname;
     private String lastname;
-    private String placeOfBirth;
     private LocalDate dateOfBirth;
-    private String nationality;
-    private Gender gender;
-    private String cin;
     private String email;
     private String username;
     private Boolean enabled;

@@ -13,12 +13,10 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findByUsername(String username);
 
-    @Query("select u from User u where u.firstname like :kw or u.lastname like :kw or u.cin like :kw order by u.firstname asc")
+    @Query("select u from User u where u.firstname like :kw or u.lastname like :kw order by u.firstname asc")
     Page<User> search(@Param("kw") String keyword, Pageable pageable);
 
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
-    boolean existsByCin(String cin);
-
     Optional<User> findByEmail(String email);
 }

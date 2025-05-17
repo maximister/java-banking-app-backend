@@ -12,14 +12,12 @@ import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, String> {
 
-    Optional<Client> findByCin(String cin);
-
-    boolean existsByCin(String cin);
-
     boolean existsByEmail(String email);
 
     boolean existsById(@NotNull String id);
 
-    @Query("select c from Client c where c.firstname like :kw or c.lastname like :kw or c.cin like :kw order by c.firstname asc")
+    Optional<Client> findByEmail(String email);
+
+    @Query("select c from Client c where c.firstname like :kw or c.lastname like :kw order by c.firstname asc")
     Page<Client> search(@Param("kw") String keyword, Pageable pageable);
 }

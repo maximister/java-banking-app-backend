@@ -21,11 +21,7 @@ public class Mappers {
         dto.setId(user.getId());
         dto.setFirstname(user.getFirstname());
         dto.setLastname(user.getLastname());
-        dto.setPlaceOfBirth(user.getPlaceOfBirth());
         dto.setDateOfBirth(user.getDateOfBirth());
-        dto.setNationality(user.getNationality());
-        dto.setGender(user.getGender());
-        dto.setCin(user.getCin());
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
         dto.setEnabled(user.isEnabled());
@@ -66,11 +62,7 @@ public class Mappers {
         final User user = new User();
         user.setFirstname(dto.getFirstname());
         user.setLastname(dto.getLastname());
-        user.setPlaceOfBirth(dto.getPlaceOfBirth());
-        user.setGender(dto.getGender());
         user.setDateOfBirth(dto.getDateOfBirth());
-        user.setNationality(dto.getNationality());
-        user.setCin(dto.getCin());
         user.setEmail(dto.getEmail());
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword());

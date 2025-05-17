@@ -17,11 +17,7 @@ public class Mapper {
         final Client client = new Client();
         client.setFirstname(dto.getFirstname());
         client.setLastname(dto.getLastname());
-        client.setPlaceOfBirth(dto.getPlaceOfBirth());
         client.setDateOfBirth(dto.getDateOfBirth());
-        client.setGender(dto.getGender());
-        client.setNationality(dto.getNationality());
-        client.setCin(dto.getCin());
         client.setEmail(dto.getEmail());
         return client;
     }
@@ -32,11 +28,7 @@ public class Mapper {
                 .id(client.getId())
                 .firstname(client.getFirstname())
                 .lastname(client.getLastname())
-                .placeOfBirth(client.getPlaceOfBirth())
                 .dateOfBirth(client.getDateOfBirth())
-                .gender(client.getGender())
-                .nationality(client.getNationality())
-                .cin(client.getCin())
                 .email(client.getEmail())
                 .createdDate(client.getCreatedDate())
                 .createdBy(client.getCreatedBy())
@@ -68,12 +60,8 @@ public class Mapper {
     @Contract("_, _ -> param1")
     public static @NotNull Client updateCustomerItems(@NotNull Client client, final @NotNull ClientRequestDTO dto){
         client.setFirstname(dto.getFirstname());
-        client.setGender(dto.getGender());
-        client.setNationality(dto.getNationality());
-        client.setCin(dto.getCin());
         client.setEmail(dto.getEmail());
         client.setLastname(dto.getLastname());
-        client.setPlaceOfBirth(dto.getPlaceOfBirth());
         client.setDateOfBirth(dto.getDateOfBirth());
         return client;
     }

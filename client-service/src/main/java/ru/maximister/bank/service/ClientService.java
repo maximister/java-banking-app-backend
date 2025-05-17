@@ -8,7 +8,7 @@ import ru.maximister.bank.dto.ClientResponseDTO;
 public interface ClientService {
 
     ClientResponseDTO getClientById(String id);
-    ClientResponseDTO getClientByCin(String cin);
+    ClientResponseDTO getClientByEmail(String email);
     ClientPageResponseDTO getAllClients(int page, int size);
     ClientPageResponseDTO searchClients(String keyword, int page, int size);
     ClientResponseDTO createClient(ClientRequestDTO dto);

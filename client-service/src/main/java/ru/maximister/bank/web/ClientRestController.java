@@ -19,9 +19,9 @@ public class ClientRestController {
         return clientService.getClientById(id);
     }
 
-    @GetMapping("/find/{cin}")
-    public ClientResponseDTO getClientByCin(@PathVariable String cin){
-        return clientService.getClientByCin(cin);
+    @GetMapping("/find/{email}")
+    public ClientResponseDTO getClientByEmail(@PathVariable String email){
+        return clientService.getClientByEmail(email);
     }
 
     @GetMapping("/list")
