@@ -10,8 +10,10 @@ import ru.maximister.bank.dto.CardRequest;
 import ru.maximister.bank.dto.CardResponse;
 import ru.maximister.bank.service.CardService;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/v1/cards")
+@RequestMapping("/cards")
 @RequiredArgsConstructor
 public class CardController {
     private final CardService cardService;
@@ -33,6 +35,12 @@ public class CardController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<CardResponse> getCardByAccountId(@PathVariable String accountId) {
         return ResponseEntity.ok(cardService.getCardByAccountId(accountId));
+    }
+
+    @GetMapping("/customer/{customerId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<List<CardResponse>> getCardByCustomerId(@PathVariable String customerId) {
+        return ResponseEntity.ok(cardService.getCardsByCustomerId(customerId));
     }
 
     @DeleteMapping("/{cardId}")

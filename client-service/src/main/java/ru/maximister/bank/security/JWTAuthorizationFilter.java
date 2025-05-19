@@ -87,8 +87,9 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
         List<String> roles = jwt.getClaims().get(ROLES).asList(String.class);
 
         if (username != null && roles != null) {
-            List<SimpleGrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).toList();
-
+            List<SimpleGrantedAuthority> authorities = roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .toList();
             UserDetails userDetails = new User(username, "", authorities);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()

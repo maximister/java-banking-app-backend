@@ -96,6 +96,7 @@ spring:
               - http://localhost:8888
               - http://localhost
               - http://127.0.0.1
+              - http://3000
             allowedMethods:
               - GET
               - POST

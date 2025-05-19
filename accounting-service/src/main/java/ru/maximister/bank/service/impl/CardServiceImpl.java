@@ -13,6 +13,7 @@ import ru.maximister.bank.repository.CardRepository;
 import ru.maximister.bank.service.CardService;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -41,6 +42,7 @@ public class CardServiceImpl implements CardService {
                 .holderLastName(request.getHolderLastName())
                 .cvv(generateCVV())
                 .account(account)
+                .customerId(account.getCustomerId())
                 .build();
 
         return mapToResponse(cardRepository.save(card));
@@ -60,6 +62,13 @@ public class CardServiceImpl implements CardService {
         return cardRepository.findByAccountId(accountId)
                 .map(this::mapToResponse)
                 .orElseThrow(() -> new EntityNotFoundException("Card not found for account: " + accountId));
+    }
+
+    @Override
+    public List<CardResponse> getCardsByCustomerId(String customerId) {
+        return cardRepository.findByCustomerId(customerId).stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
@@ -92,7 +101,7 @@ public class CardServiceImpl implements CardService {
                 .cardNumber(card.getCardNumber())
                 .holderFirstName(card.getHolderFirstName())
                 .holderLastName(card.getHolderLastName())
-                .maskedCvv("***")
+                .maskedCvv(card.getCvv())
                 .createdAt(card.getCreatedAt())
                 .accountId(card.getAccount().getId())
                 .build();

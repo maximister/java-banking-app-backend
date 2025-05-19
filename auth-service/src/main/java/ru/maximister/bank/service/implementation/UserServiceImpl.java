@@ -1,5 +1,6 @@
 package ru.maximister.bank.service.implementation;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import  ru.maximister.bank.dto.*;
@@ -10,6 +11,7 @@ import  ru.maximister.bank.exception.RoleNotFoundException;
 import  ru.maximister.bank.exception.UserNotFoundException;
 import  ru.maximister.bank.repository.RoleRepository;
 import  ru.maximister.bank.repository.UserRepository;
+import ru.maximister.bank.service.RoleService;
 import  ru.maximister.bank.service.UserService;
 import  ru.maximister.bank.util.mapper.Mappers;
 import org.springframework.data.domain.Page;
@@ -24,17 +26,12 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Transactional
     @Override
@@ -43,6 +40,8 @@ public class UserServiceImpl implements UserService {
         validationBeforeCreate(dto.getEmail(), dto.getUsername());
         User user = Mappers.fromUserRequestDTO(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        Role role = findRoleByName("USER");
+        user.setRoles(List.of(role));
         User savedUser = userRepository.save(user);
         log.info("User saved with id: {}", savedUser.getId());
         return Mappers.fromUser(savedUser);
@@ -174,8 +173,9 @@ public class UserServiceImpl implements UserService {
         if(userRepository.existsByEmail(email)) {
             messages.add("Email already exists");
         }
+        log.info("{}", messages);
         if(!messages.isEmpty()){
-            throw new FieldValidationException("Invalid username or email or cin", messages);
+            throw new FieldValidationException("Invalid username or email", messages);
         }
     }
 

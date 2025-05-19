@@ -3,6 +3,7 @@ package ru.maximister.bank.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import ru.maximister.bank.enums.AccountType;
 
@@ -14,7 +15,7 @@ public class CreateAccountRequest {
     private String customerId;
     
     @NotNull(message = "Initial balance is required")
-    @Positive(message = "Initial balance must be positive")
+    @PositiveOrZero(message = "Initial balance must be positive")
     private BigDecimal initialBalance;
     
     @NotNull(message = "Account type is required")

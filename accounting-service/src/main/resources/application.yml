@@ -16,7 +16,7 @@ spring:
     password: ${POSTGRES_PASSWORD:admin}
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -63,4 +63,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*" 
+        include: "*"
+
+
+logging:
+  level:
+    org.springframework.security: DEBUG

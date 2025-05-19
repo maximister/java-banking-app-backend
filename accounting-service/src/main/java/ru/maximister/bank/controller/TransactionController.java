@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/transactions")
+@RequestMapping("/transactions")
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;

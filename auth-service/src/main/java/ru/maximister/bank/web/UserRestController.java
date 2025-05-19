@@ -74,7 +74,9 @@ public class UserRestController {
     @PreAuthorize("hasAnyAuthority('USER','ADMIN','SUPER_ADMIN')")
     @GetMapping("/profile")
     public UserResponseDTO getUserByUsername() {
+        log.info("aboba");
         String username = getCurrentUsername();
+        log.info("{}", username);
         return userService.getUserByUsername(username);
     }
 
@@ -95,6 +97,7 @@ public class UserRestController {
 
     private String getCurrentUsername() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("{}", principal);
         if (principal instanceof UserDetails userDetails) {
             return userDetails.getUsername();
         }

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -21,6 +22,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ru.maximister.bank.config.ApplicationProperties;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -87,7 +90,11 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
         List<String> roles = jwt.getClaims().get(ROLES).asList(String.class);
 
         if (username != null && roles != null) {
-            List<SimpleGrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).toList();
+
+            List<SimpleGrantedAuthority> authorities = roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .toList();
+
 
             UserDetails userDetails = new User(username, "", authorities);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

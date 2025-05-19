@@ -44,7 +44,7 @@ public class AuthenticationServiceApplication {
                     roleRepository.save(userRole);
                     roleRepository.save(adminRole);
                     roleRepository.save(superAdminRole);
-                    log.info("Roles 'USER', 'MODERATOR', 'ADMIN' and 'SUPER_ADMIN' created successfully'");
+                    log.info("Roles 'USER', 'ADMIN' and 'SUPER_ADMIN' created successfully'");
                 } catch (Exception e) {
                     log.error("Error while creating roles", e);
                 }
@@ -58,7 +58,7 @@ public class AuthenticationServiceApplication {
                     superAdmin.setLastname("Administrator's Last Name");
                     superAdmin.setDateOfBirth(LocalDate.of(1994, 1, 22));
                     superAdmin.setUsername("ADMINISTRATOR");
-                    superAdmin.setEmail("maximrevenko1@gmail.com");
+                    superAdmin.setEmail("admin@admin.com");
                     superAdmin.setPasswordNeedToBeModified(Boolean.TRUE);
                     String defaultPassword = "admin";
                     superAdmin.setPassword(passwordEncoder.encode(defaultPassword));

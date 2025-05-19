@@ -9,6 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import ru.maximister.bank.enums.AccountStatus;
 import ru.maximister.bank.enums.AccountType;
+import ru.maximister.bank.utils.AccountNumberGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,7 +24,6 @@ import java.time.LocalDateTime;
 @Builder
 public class Account {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(nullable = false)
@@ -59,4 +59,11 @@ public class Account {
 
     @LastModifiedBy
     private String lastModifiedBy;
+
+    @PrePersist
+    private void ensureId() {
+        if (this.id == null || this.id.isEmpty()) {
+            this.id = AccountNumberGenerator.generateAccountNumber();
+        }
+    }
 } 

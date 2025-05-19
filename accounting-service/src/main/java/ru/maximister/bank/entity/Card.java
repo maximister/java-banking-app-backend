@@ -25,6 +25,9 @@ public class Card {
     @Column(name = "id", columnDefinition = "VARCHAR(36)")
     private String id;
 
+    @Column(name = "customer_id")
+    private String customerId;
+
     @Column(name = "card_number", nullable = false, unique = true, length = 16)
     @Size(min = 16, max = 16, message = "Card number must be exactly 16 digits")
     @Pattern(regexp = "^[0-9]{16}$", message = "Card number must contain only digits")

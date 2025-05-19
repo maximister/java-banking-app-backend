@@ -21,7 +21,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SUPER_ADMIN')")
     public ResponseEntity<AccountResponse> createAccount(@Valid @RequestBody CreateAccountRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(accountService.createAccount(request));
@@ -31,6 +31,12 @@ public class AccountController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<AccountResponse> getAccount(@PathVariable String accountId) {
         return ResponseEntity.ok(accountService.getAccount(accountId));
+    }
+
+    @GetMapping("/card/{cardNumber}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<AccountResponse> getAccountByCardNumber(@PathVariable String cardNumber) {
+        return ResponseEntity.ok(accountService.getAccountByCardNumber(cardNumber));
     }
 
     @GetMapping("/customer/{customerId}")

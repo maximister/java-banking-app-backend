@@ -68,7 +68,7 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     @Override
     public ClientResponseDTO createClient(@NotNull ClientRequestDTO dto) {
-        validateBeforeCreateClient(dto.getEmail(), dto.getCin());
+        validateBeforeCreateClient(dto.getEmail());
         Client client = Mapper.fromCustomer(dto);
         Client savedClient = clientRepository.save(client);
         log.info("Client created with id {}", savedClient.getId());
@@ -100,7 +100,7 @@ public class ClientServiceImpl implements ClientService {
                 .orElseThrow(() -> new ClientNotFoundException(String.format("Client with id %s not found", id)));
     }
 
-    private void validateBeforeCreateClient(String email, String cin) {
+    private void validateBeforeCreateClient(String email) {
         List<String> messages = new ArrayList<>();
         if (clientRepository.existsByEmail(email)) {
             messages.add(String.format("Client with email '%s' already exist", email));

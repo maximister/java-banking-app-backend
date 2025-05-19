@@ -45,9 +45,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Authentication authenticationResponse = authenticationManager.authenticate(authenticationRequest);
         if (authenticationResponse.isAuthenticated()) {
             User user = getUserByUsername(dto.username());
-            if(!user.isEnabled()){
-                throw new UserNotEnabledException(String.format("User %s is not enabled", dto.username()));
-            }
             log.info("Authentication successful");
             final String jwt = generateToken(user);
             updateUserLastLoginDate(user);

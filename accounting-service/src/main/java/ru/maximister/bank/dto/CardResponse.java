@@ -31,9 +31,6 @@ public class CardResponse {
      */
     private String holderLastName;
 
-    /**
-     * Маскированный CVV код (всегда возвращается как "***")
-     */
     private String maskedCvv;
 
     /**
