@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.maximister.bank.dto.ChangePasswordRequestDTO;
+import ru.maximister.bank.dto.VerifyDto;
 import ru.maximister.bank.entity.User;
 import ru.maximister.bank.entity.Verification;
 import ru.maximister.bank.exception.TooManyRequestsException;
@@ -39,24 +40,43 @@ public class PasswordServiceImpl implements PasswordService {
         log.info("Requesting code to reset password for email: {}", email);
         User user = findUserByEmail(email);
 
-        //Checking whether there is a pending verification request
         Verification existingVerification = verificationRepository.findByEmail(user.getEmail()).orElse(null);
 
         if (existingVerification != null && existingVerification.getExpiryDate().isAfter(LocalDateTime.now())) {
             throw new TooManyRequestsException("You must wait for 10 minutes before requesting a new code");
         }
 
-        //Delete old check if it exists and is expired
         if (existingVerification != null) {
             verificationRepository.delete(existingVerification);
             log.info("Expired verification for email {} deleted", email);
         }
 
-        //Create a new verification and send the code by email
         Verification newVerification = createAndSaveVerification(user.getEmail());
         sendByMail(newVerification);
 
         log.info("Verification code sent to email: {}", email);
+    }
+
+    @Override
+    public void verifyUser(String username) {
+        log.info("Requesting code to reset password for user: {}", username);
+        User user = userRepository.findByUsername(username).orElseThrow();
+
+        Verification existingVerification = verificationRepository.findByEmail(user.getEmail()).orElse(null);
+
+        if (existingVerification != null && existingVerification.getExpiryDate().isAfter(LocalDateTime.now())) {
+            throw new TooManyRequestsException("You must wait for 10 minutes before requesting a new code");
+        }
+
+        if (existingVerification != null) {
+            verificationRepository.delete(existingVerification);
+            log.info("Expired verification for email {} deleted", user.getEmail());
+        }
+
+        Verification newVerification = createAndSaveVerification(user.getEmail());
+        sendByMail(newVerification);
+
+        log.info("Verification code sent to email: {}", user.getEmail());
     }
 
     @Override
@@ -74,6 +94,19 @@ public class PasswordServiceImpl implements PasswordService {
         user.setPassword(passwordEncoder.encode(dto.password()));
         userRepository.save(user);
         log.info("user's password updated");
+        verificationRepository.delete(verification);
+    }
+
+    @Override
+    public void verify(VerifyDto verifyDto) {
+        log.info("resetPassword requested");
+        Verification verification = verificationRepository.findByEmailAndCode(verifyDto.code(), verifyDto.email())
+                .orElseThrow(() -> new VerificationNotFoundException("code not found"));
+        if(verification.isExpired()){
+            throw new VerificationCodeExpiredException("code is expired : ask for another code");
+        }
+
+        log.info("user's verified");
         verificationRepository.delete(verification);
     }
 

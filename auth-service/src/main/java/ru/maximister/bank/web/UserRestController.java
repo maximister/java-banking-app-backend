@@ -1,8 +1,8 @@
 package ru.maximister.bank.web;
 
 import lombok.extern.slf4j.Slf4j;
-import  ru.maximister.bank.dto.*;
-import  ru.maximister.bank.service.UserService;
+import ru.maximister.bank.dto.*;
+import ru.maximister.bank.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +19,6 @@ public class UserRestController {
         this.userService = userService;
     }
 
-    //@PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PostMapping("/create")
     public UserResponseDTO createUser(@RequestBody UserRequestDTO dto) {
         log.info("Got {}", dto);
