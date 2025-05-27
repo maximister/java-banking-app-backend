@@ -1,0 +1,203 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: jbank-postgres
+    environment:
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=bank_accounts
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - jbank-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:6.0
+    container_name: jbank-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=bank_transactions
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - jbank-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: jbank-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - jbank-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: jbank-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - jbank-network
+
+  discovery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: discovery
+    container_name: jbank-discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - jbank-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: gateway
+    container_name: jbank-gateway
+    ports:
+      - "8888:8888"
+    networks:
+      - jbank-network
+    depends_on:
+      - discovery
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka/
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: auth
+    container_name: jbank-auth
+    ports:
+      - "8885:8885"
+    networks:
+      - jbank-network
+    depends_on:
+      - discovery
+      - gateway
+      - postgres
+      - kafka
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=bank_accounts
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - KAFKA_SERVER=kafka:9092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka/
+
+  client-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: client
+    container_name: jbank-client
+    ports:
+      - "8886:8886"
+    networks:
+      - jbank-network
+    depends_on:
+      - discovery
+      - gateway
+      - postgres
+      - auth-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=bank_accounts
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka/
+  accounting-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: accounting
+    container_name: jbank-accounting
+    ports:
+      - "8887:8887"
+    networks:
+      - jbank-network
+    depends_on:
+      - discovery
+      - postgres
+      - mongodb
+      - kafka
+      - auth-service
+      - client-service
+      - gateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=bank_accounts
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DB=bank_transactions
+      - KAFKA_SERVERS=kafka:9092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka/
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: notification
+    container_name: jbank-notification
+    networks:
+      - jbank-network
+    depends_on:
+      - discovery
+      - kafka
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EMAIL_SYSTEM=maximrevenko12@gmail.com
+      - MAIL_PASSWORD=ombvvjlxjltmlowe
+      - KAFKA_SERVER=kafka:9092
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka/
+
+networks:
+  jbank-network:
+    driver: bridge
+    name: jbank-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
