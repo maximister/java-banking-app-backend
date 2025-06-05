@@ -32,12 +32,12 @@ JBank — Веб-приложение для симуляции банковск
 Приложение состоит из серверной части, реализованной с помощью Spring Framework, и клиентской части на Next.js.
 
 Серверная часть состоит из нескольких компонентов:
-- Auth service - приложение для авторизации пользователей;
-- Client service - приложение для работы с банковским  аккаунтом пользователя;
-- Accounting service - приложение для управления счетами и транзакциями;
-- Notification service - приложение для отправки почтовых уведомлений пользователям;
-- Gateway - служит единой точкой входа в серверную часть;
-- Discovery service - помогает отслеживать актуальные адресы сервисов и их состояние для правильного роутинга в Gateway приложении.
+- Auth service - приложение для авторизации пользователей [docker image](https://hub.docker.com/repository/docker/maximister/jbank-backend-auth-service);
+- Client service - приложение для работы с банковским  аккаунтом пользователя [docker image](https://hub.docker.com/repository/docker/maximister/jbank-backend-client-service/general);
+- Accounting service - приложение для управления счетами и транзакциями [docker image](https://hub.docker.com/repository/docker/maximister/jbank-backend-accounting-service);
+- Notification service - приложение для отправки почтовых уведомлений пользователям [docker image](https://hub.docker.com/repository/docker/maximister/jbank-backend-notification-service);
+- Gateway - служит единой точкой входа в серверную часть [docker image](https://hub.docker.com/repository/docker/maximister/jbank-backend-gateway/general);
+- Discovery service - помогает отслеживать актуальные адресы сервисов и их состояние для правильного роутинга в Gateway приложении [docker image](https://hub.docker.com/repository/docker/maximister/jbank-backend-discovery/general).
 
 Общая схема приложения представлена на слегка шакальном рисунке ниже:
 
@@ -62,6 +62,9 @@ docker compose up
 docker compose up -d # запуск в фоне
 ```
 Сервер будет доступен по адресу [http://localhost:8888/](http://localhost:8888/)
+
+**Примечание**
+- В разделе Архитектура предоставлены ссылки на готовые docker image серверных компонентов. Если у вас нет возмможности сбилдить приложение локально, можно указать эти образы в docker-compose
 
 4) Склонировать репозиторий клиентской части:
 ```
