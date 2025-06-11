@@ -188,8 +188,8 @@ services:
       - kafka
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - EMAIL_SYSTEM=maximrevenko12@gmail.com
-      - MAIL_PASSWORD=ombvvjlxjltmlowe
+      - EMAIL_SYSTEM=aboba@gmail.com
+      - MAIL_PASSWORD=aboba
       - KAFKA_SERVER=kafka:9092
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka/
 
