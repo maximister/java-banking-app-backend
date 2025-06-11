@@ -16,7 +16,6 @@ import ru.maximister.bank.dto.LoginResponseDTO;
 import ru.maximister.bank.entity.Role;
 import ru.maximister.bank.entity.User;
 import ru.maximister.bank.exception.UserNotAuthenticatedException;
-import ru.maximister.bank.exception.UserNotEnabledException;
 import ru.maximister.bank.exception.UserNotFoundException;
 import ru.maximister.bank.repository.UserRepository;
 import ru.maximister.bank.service.AuthenticationService;

@@ -1,5 +1,6 @@
 package ru.maximister.bank.web;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import ru.maximister.bank.dto.*;
 import ru.maximister.bank.service.UserService;
@@ -20,20 +21,20 @@ public class UserRestController {
     }
 
     @PostMapping("/create")
-    public UserResponseDTO createUser(@RequestBody UserRequestDTO dto) {
+    public UserResponseDTO createUser(@RequestBody @Valid UserRequestDTO dto) {
         log.info("Got {}", dto);
         return userService.createUser(dto);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PutMapping("/update/{id}")
-    public UserResponseDTO updateUser(@PathVariable String id, @RequestBody UserRequestDTO dto) {
+    public UserResponseDTO updateUser(@PathVariable String id, @RequestBody @Valid UserRequestDTO dto) {
         return userService.updateUser(id, dto);
     }
 
     @PreAuthorize("hasAnyAuthority('USER','ADMIN','SUPER_ADMIN')")
     @PostMapping("/pwd")
-    public UserResponseDTO updatePassword(@RequestBody UpdatePasswordRequestDTO dto) {
+    public UserResponseDTO updatePassword(@RequestBody @Valid UpdatePasswordRequestDTO dto) {
         String username = getCurrentUsername();
         return userService.updatePassword(username, dto);
     }
@@ -54,13 +55,13 @@ public class UserRestController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PostMapping("/roles/add")
-    public UserResponseDTO addRoleToUser(@RequestBody UserRoleRequestDTO dto) {
+    public UserResponseDTO addRoleToUser(@RequestBody @Valid UserRoleRequestDTO dto) {
         return userService.addRoleToUser(dto);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN','SUPER_ADMIN')")
     @PostMapping("/roles/remove")
-    public UserResponseDTO removeRoleFromUser(@RequestBody UserRoleRequestDTO dto) {
+    public UserResponseDTO removeRoleFromUser(@RequestBody @Valid UserRoleRequestDTO dto) {
         return userService.removeRoleFromUser(dto);
     }
 

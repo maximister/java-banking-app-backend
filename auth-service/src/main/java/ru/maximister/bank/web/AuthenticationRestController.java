@@ -1,5 +1,6 @@
 package ru.maximister.bank.web;
 
+import jakarta.validation.Valid;
 import  ru.maximister.bank.dto.LoginRequestDTO;
 import  ru.maximister.bank.dto.LoginResponseDTO;
 import  ru.maximister.bank.service.AuthenticationService;
@@ -19,7 +20,7 @@ public class AuthenticationRestController {
     }
 
     @PostMapping("/login")
-    public LoginResponseDTO authenticate(@RequestBody LoginRequestDTO requestDTO) {
+    public LoginResponseDTO authenticate(@RequestBody @Valid LoginRequestDTO requestDTO) {
         return authenticationService.authenticate(requestDTO);
     }
 }
